@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  Email
+  Google
+}
+
+model User {
+  id                      Int      @id @default(autoincrement())
+  userName                String   @unique
+  email                   String   @unique
+  passwordHash            String?
+  passwordSalt            String?
+  passwordResetToken      String? @db.Text @unique
+  emailVerificationToken  String? @db.Text @unique
+  refreshToken            String? @db.Text @unique
+  authProvider            AuthProvider
+  passwordResetStamp      DateTime?@default("1970-01-01T00:00:00Z")
+  emailConfirmed          DateTime?@default("1970-01-01T00:00:00Z")
+  created                 DateTime @default(now())
+  refreshTokenExpires     DateTime?@default("1970-01-01T00:00:00Z")
+}
+
