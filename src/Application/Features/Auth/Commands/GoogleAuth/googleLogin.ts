@@ -34,7 +34,7 @@ export const loginGoogleAuthUser = async(request: string) => {
         const currentDateTime: Date = new Date();
         currentDateTime.setMinutes(currentDateTime.getMinutes() + refreshTokenExpirationInMilliseconds);
     
-        await updateRefreshToken(refreshToken, currentDateTime);
+        await updateRefreshToken(user.id, refreshToken, currentDateTime);
     
         const loginDto: LoginDto = {
             userName: user.userName,
