@@ -5,10 +5,11 @@ import { LibraryDto } from "./libraryDto";
 import { findConnectedStreamingPlatformByUserId, updateRefreshToken } from "src/Infrastructure/Persistence/Repository/streamingPlatforms.repository";
 import { BAD_REQUEST } from "http-status";
 import logger from "src/Shared/Infrastructure/logger";
+import { StreamingPlatform } from "@prisma/client";
 
-export const getUserPlaylistsQueryHandler = async (userId: number, page: number, perPage: number, accessToken: string): 
+export const getSpotifyUserPlaylistsQueryHandler = async (userId: number, page: number, perPage: number, accessToken: string): 
 Promise<LibraryDto> => {
-    const streamingPlatform = await findConnectedStreamingPlatformByUserId(userId);
+    const streamingPlatform = await findConnectedStreamingPlatformByUserId(userId, StreamingPlatform.Spotify);
     if (!streamingPlatform)
         throw new TuneSyncError(new ErrorCode("UnConnectedSpotifyAccount", 
             "You have not connected your spotify account, please connect before you can get your playlists", BAD_REQUEST));

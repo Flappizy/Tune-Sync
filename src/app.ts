@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import authRouter from './Routes/auth.routes';
 import spotifyRouter from './Routes/spotify.routes';
+import deezerRouter from './Routes/deezer.routes';
 import cors from 'cors';
 import { errorHandler } from './Infrastructure/Middlewares/errorMiddleware';
 import express, { NextFunction, Request, Response, response } from 'express';
@@ -50,6 +51,7 @@ swaggerDocs(app, port);
 // ROUTES
 app.use('/api/auth', authRouter);
 app.use('/api/spotify', spotifyRouter);
+app.use('/api/deezer', spotifyRouter);
 
  // UNHANDLED ROUTES
  app.all('*', (req: Request, res: Response, next: NextFunction) => {

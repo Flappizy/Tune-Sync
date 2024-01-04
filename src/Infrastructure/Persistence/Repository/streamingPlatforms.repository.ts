@@ -25,15 +25,15 @@ export const createUserStreamingPlatform = async (input: Prisma.UserConnectedStr
     })) as UserConnectedStreamingPlatform;
   };
 
-  export const findConnectedStreamingPlatformByUserId = async (userId: number) => {
+  export const findConnectedStreamingPlatformByUserId = async (userId: number, platform: StreamingPlatform) => {
     return (await prisma.userConnectedStreamingPlatform.findFirst({
-      where: { userId: userId,streamingPlatform: StreamingPlatform.Spotify },
+      where: { userId: userId,streamingPlatform: platform },
     })) as UserConnectedStreamingPlatform;
   };
 
-  export const doesConnectedStreamingPlatformExists = async (userId: number) => {
+  export const doesConnectedStreamingPlatformExists = async (userId: number, platform: StreamingPlatform) => {
     const count = await prisma.userConnectedStreamingPlatform.count({
-      where: { userId: userId, streamingPlatform: StreamingPlatform.Spotify },
+      where: { userId: userId, streamingPlatform: platform },
     });
    
     if (count > 0) {

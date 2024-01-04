@@ -1,7 +1,7 @@
 import { ErrorCode } from "src/Domain/Exceptions/errorCode";
 import { TuneSyncError } from "src/Domain/Exceptions/tuneSyncError";
 import { StreamingPlatformConnect } from "src/Domain/Validations/streamingPlatform.validation";
-import { createUserStreamingPlatform, doesConnectedStreamingPlationExists } from "src/Infrastructure/Persistence/Repository/streamingPlatforms.repository";
+import { createUserStreamingPlatform, doesConnectedStreamingPlatformExists } from "src/Infrastructure/Persistence/Repository/streamingPlatforms.repository";
 import { findUniqueUser } from "src/Infrastructure/Persistence/Repository/user.repository";
 import { StreamingPlatform } from "@prisma/client";
 import spotifyService from "../../Services/spotifyService";
@@ -16,9 +16,9 @@ Promise<SpotifyOAuthDto> => {
     if (!user)
         throw new TuneSyncError(ErrorCode.UserNotExits);
 
-    const userHasConnectedSpotify = await doesConnectedStreamingPlationExists(user.id);
+    const userHasConnectedSpotify = await doesConnectedStreamingPlatformExists(user.id, StreamingPlatform.Spotify);
     if(userHasConnectedSpotify)
-        throw new TuneSyncError(new ErrorCode("SpotifyHasAlredyBeenConnected", "User spotify account has already been connected", BAD_REQUEST));
+        throw new TuneSyncError(new ErrorCode("SpotifyHasAlredyBeenConnected", "User's Spotify account has already been connected", BAD_REQUEST));
 
     const spotifyRefreshAndAccessToken = await spotifyService.getSpotifyUserAccessAndRefreshToken(connectPlatform.code);
     const spotifyUserId = await spotifyService.getUserProfileData(spotifyRefreshAndAccessToken.access_token);

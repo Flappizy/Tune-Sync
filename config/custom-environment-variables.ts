@@ -12,7 +12,11 @@ export default {
     spotifyClientId: 'Spotify_Client_Id',
     spotifyRedirectURI: 'Spotify_Redirect_URI',
     spotifyClientSecret: 'Spotify_Client_Secret',
-    spotifyScope: 'Spotify_Scope'
+    spotifyScope: 'Spotify_Scope',
+    deezerAppId: 'Deezer_App_Id',
+    deezerRedirectURI: 'Deezer_Redirect_URI',
+    deezerSecretKey: 'Deezer_Secret_Key',
+    deezerScope: 'Deezer_Scope'
 
     /*smtp: {
       host: 'EMAIL_HOST',

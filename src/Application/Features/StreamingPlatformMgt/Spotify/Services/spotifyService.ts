@@ -2,12 +2,11 @@ import { SpotifyOAuthDto } from '../Commands/ConnectSpotify/spotifyOAuthDto';
 import config from 'config';
 import qs from "qs";
 import axios from "axios";
-import { OK, UNAUTHORIZED } from 'http-status';
+import { UNAUTHORIZED } from 'http-status';
 import { SpotifyUserId } from '../Commands/ConnectSpotify/spotifyUserId';
 import { PlaylistDto } from '../Queries/GetUserPlaylists/playlistDto';
 import { LibraryDto } from '../Queries/GetUserPlaylists/libraryDto';
 import logger from 'src/Shared/Infrastructure/logger';
-import { Console } from 'console';
 
 class SpotifyService {
   private clientId;
@@ -21,7 +20,7 @@ class SpotifyService {
 
   async getSpotifyUserAccessAndRefreshToken(code: string): Promise<SpotifyOAuthDto> {    
     
-    var authOptions = {
+    const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
@@ -51,7 +50,7 @@ class SpotifyService {
   }
 
   async #getNewAccessToken (refreshToken: string): Promise<SpotifyOAuthDto> {
-    var authOptions = {
+    const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
@@ -78,7 +77,7 @@ class SpotifyService {
   }
 
   async getUserProfileData (accesToken: string): Promise<SpotifyUserId> {
-    var authOptions = {
+    const authOptions = {
       url: 'https://api.spotify.com/v1/me',
       headers: {
         'Authorization': `Bearer ${accesToken}`,
@@ -102,7 +101,7 @@ class SpotifyService {
 
   async getUserPlaylist(accesToken: string, refreshToken: string, userId: string, page: number, perPage: number): Promise<LibraryDto> {
     const offset = (page - 1) * perPage;
-    var authOptions = {
+    const authOptions = {
       url: `https://api.spotify.com/v1/users/${userId}/playlists?offset=${offset}&limit=${perPage}`,
       headers: {
         'Authorization': `Bearer ${accesToken}`,

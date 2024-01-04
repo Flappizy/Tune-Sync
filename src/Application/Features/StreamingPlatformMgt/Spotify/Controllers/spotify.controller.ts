@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { stateCookiesOptions, spotifyCookiesOptions } from 'src/Infrastructure/Utilities/customCookieOptions';
 import config from 'config';
 import { connectSpotifyCommandHandler } from '../Commands/ConnectSpotify/connectSpotifyCommandHandler';
-import { getUserPlaylistsQueryHandler } from '../Queries/GetUserPlaylists/getUserPlaylistsQueryHandler';
+import { getSpotifyUserPlaylistsQueryHandler } from '../Queries/GetUserPlaylists/getSpotifyUserPlaylistsQueryHandler';
 
 export const getAuthorizationCodeFromSpotifyHandler =  async (
     req: Request,
@@ -36,7 +36,7 @@ export const storeSpotifyRefreshInDBAndAccessTokenInCookiesHandler = async (
         try {
             const response = await connectSpotifyCommandHandler({code: code, userRefreshToken: state });
             res.cookie('spotify_access_token', response.access_token, spotifyCookiesOptions);
-            return res.status(204).send(); 
+            return res.status(204).send(); //To do: Redirect back to the client
         } catch (error: any) {
             next(error);
     }        
@@ -52,7 +52,7 @@ export const getUserPlaylistHandler = async (
     const perPage = Number(req.query.perPage); 
 
     try {
-        const userLibrary = await getUserPlaylistsQueryHandler(userId, page, perPage, accessToken);
+        const userLibrary = await getSpotifyUserPlaylistsQueryHandler(userId, page, perPage, accessToken);
         if (userLibrary.accessToken)
             res.cookie('spotify_access_token', userLibrary.accessToken, spotifyCookiesOptions);
 
