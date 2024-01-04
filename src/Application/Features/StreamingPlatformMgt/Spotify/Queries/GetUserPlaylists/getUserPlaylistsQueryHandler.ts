@@ -2,13 +2,13 @@ import { ErrorCode } from "src/Domain/Exceptions/errorCode";
 import { TuneSyncError } from "src/Domain/Exceptions/tuneSyncError";
 import spotifyService from "../../Services/spotifyService";
 import { LibraryDto } from "./libraryDto";
-import { findConnectedStreamingPlationByUserId, updateRefreshToken } from "src/Infrastructure/Persistence/Repository/streamingPlatforms.repository";
+import { findConnectedStreamingPlatformByUserId, updateRefreshToken } from "src/Infrastructure/Persistence/Repository/streamingPlatforms.repository";
 import { BAD_REQUEST } from "http-status";
 import logger from "src/Shared/Infrastructure/logger";
 
 export const getUserPlaylistsQueryHandler = async (userId: number, page: number, perPage: number, accessToken: string): 
 Promise<LibraryDto> => {
-    const streamingPlatform = await findConnectedStreamingPlationByUserId(userId);
+    const streamingPlatform = await findConnectedStreamingPlatformByUserId(userId);
     if (!streamingPlatform)
         throw new TuneSyncError(new ErrorCode("UnConnectedSpotifyAccount", 
             "You have not connected your spotify account, please connect before you can get your playlists", BAD_REQUEST));
