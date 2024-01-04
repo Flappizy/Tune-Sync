@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { object, string, TypeOf, z } from 'zod';
 
 function isStrongPassword(password: string): boolean {
@@ -20,7 +19,8 @@ function isStrongPassword(password: string): boolean {
 }
 
 enum AuthProvider {
-  Email
+  Email,
+  Google
 }
 
 

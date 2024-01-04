@@ -12,5 +12,24 @@ export const refreshTokenCookiesOptions: CookieOptions = {
     //maxAge: Date.now() + config.get<number>('refreshExpiration') * 60 * 1000
 };
 
+export const stateCookiesOptions: CookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+    expires: new Date(
+        Date.now() + 60 * 60 * 1000
+    )
+};
+
+export const spotifyCookiesOptions: CookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+    expires: new Date(
+        Date.now() + 60 * 60 * 1000
+    )
+};
+
+
 
   

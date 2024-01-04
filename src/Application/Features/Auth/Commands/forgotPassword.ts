@@ -9,7 +9,7 @@ import logger from 'src/Shared/Infrastructure/logger';
 import { sendMail } from 'src/Infrastructure/Utilities/emailService';
 import Handlebars from 'handlebars';
 
-export const forgotPassword = async(req: EmailType) => {
+export const forgotPasswordCommandHandler = async(req: EmailType) => {
     const user = await findUniqueUser(
         { email: req.email.toLowerCase() });
 

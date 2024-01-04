@@ -1,14 +1,14 @@
-import { signup } from 'src/Application/Features/Auth/Commands/signup';
-import { loginUser } from 'src/Application/Features/Auth/Commands/Login/login';
-import { verifyEmail } from 'src/Application/Features/Auth/Commands/verifyEmail';
-import { forgotPassword } from 'src/Application/Features/Auth/Commands/forgotPassword';
-import { resetPassword } from 'src/Application/Features/Auth/Commands/resetPassword';
-import { refreshUserToken } from 'src/Application/Features/Auth/Commands/RefreshToken/refreshToken';
+import { signupCommandHandler } from 'src/Application/Features/Auth/Commands/signup';
+import { loginUserCommandHandler } from 'src/Application/Features/Auth/Commands/Login/login';
+import { verifyEmailCommandHandler } from 'src/Application/Features/Auth/Commands/verifyEmail';
+import { forgotPasswordCommandHandler } from '../Commands/forgotPassword';
+import { resetPasswordCommandHandler } from 'src/Application/Features/Auth/Commands/resetPassword';
+import { refreshUserTokenCommandHandler } from 'src/Application/Features/Auth/Commands/RefreshToken/refreshToken';
 import { NextFunction, Request, Response } from 'express';
 import { refreshTokenCookiesOptions } from 'src/Infrastructure/Utilities/customCookieOptions';
 import { SignupSchemaType, LoginUserInput, VerifyEmailType, EmailType, ResetPasswordType, RefreshTokenType } from "src/Domain/Validations/auth.validation";
-import { generateOtp } from 'src/Application/Features/Auth/Commands/generateOtp';
-import { loginGoogleAuthUser } from 'src/Application/Features/Auth/Commands/GoogleAuth/googleLogin';
+import { generateOtpCommandHandler } from 'src/Application/Features/Auth/Commands/generateOtp';
+import { loginGoogleAuthUserCommandHandler } from 'src/Application/Features/Auth/Commands/GoogleAuth/googleLogin';
 
 export const registerUserHandler =  async (
   req: Request<{}, {}, SignupSchemaType>,
@@ -16,7 +16,7 @@ export const registerUserHandler =  async (
   next: NextFunction) => {
 
     try {      
-      await signup(req.body);      
+      await signupCommandHandler(req.body);      
       return res.status(201).json({
         status: 'success',
         data: {
@@ -34,7 +34,7 @@ export const loginUserHandler = async (
   next: NextFunction) => {
 
     try {      
-      const loginDto = await loginUser(req.body);  
+      const loginDto = await loginUserCommandHandler(req.body);  
       res.cookie('refresh_token', loginDto.refreshToken, refreshTokenCookiesOptions);
       return res.status(200).json({
         status: 'success',
@@ -51,7 +51,7 @@ export const verifyUserAccountHandler = async (
   next: NextFunction
 ) => {
     try {
-        await verifyEmail(req.body);
+        await verifyEmailCommandHandler(req.body);
         return res.status(200).json({
           status: 'success',
           data: {
@@ -69,7 +69,7 @@ export const generateOtpHandler = async (
   next: NextFunction
 ) => {
     try {
-      await generateOtp(req.body);
+      await generateOtpCommandHandler(req.body);
       return res.status(204).send();
     } catch (error) {
         next(error);
@@ -82,7 +82,7 @@ export const forgotPasswordHandler = async (
   next: NextFunction
 ) => {
     try {
-      await forgotPassword(req.body);
+      await forgotPasswordCommandHandler(req.body);
       return res.status(204).send();
     } catch (error) {
         next(error);
@@ -95,7 +95,7 @@ export const resetUserPasswordHandler = async (
   next: NextFunction
 ) => {
     try {
-        await resetPassword(req.body);
+        await resetPasswordCommandHandler(req.body);
         return res.status(200).json({
           status: 'success',
           data: {
@@ -125,7 +125,7 @@ export const refreshTokenHandler = async (
         const refreshTokenType: RefreshTokenType = {
             refreshToken: refreshToken
         }
-        const response = await refreshUserToken(refreshTokenType);
+        const response = await refreshUserTokenCommandHandler(refreshTokenType);
 
         res.cookie('refresh_token', response.refreshToken, refreshTokenCookiesOptions);
         return res.status(200).json({
@@ -164,7 +164,7 @@ export const loginGoogleUserHandler = async (
 
     try {      
       const code: any = req.query.code;
-      const loginDto = await loginGoogleAuthUser(code);  
+      const loginDto = await loginGoogleAuthUserCommandHandler(code);  
       res.cookie('refresh_token', loginDto.refreshToken, refreshTokenCookiesOptions);
       return res.status(200).json({
         status: 'success',

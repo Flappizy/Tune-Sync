@@ -9,7 +9,7 @@ import Handlebars from 'handlebars';
 
 
 
-export const generateOtp = async (request: EmailType) => {
+export const generateOtpCommandHandler = async (request: EmailType) => {
     const user = await findUniqueUser(
         { email: request.email.toLowerCase() });
 

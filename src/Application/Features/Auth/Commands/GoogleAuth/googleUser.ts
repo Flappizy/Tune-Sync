@@ -1,11 +1,11 @@
-import { GoogleOauthTokenDto } from "./googleOauthTokenDto";
+import { OauthTokenDto } from "./googleOauthTokenDto";
 import { GoogleUserDto } from "./googleUserDto";
 import axios from "axios";
 
 export async function getGoogleUser({
     id_token,
     access_token,
-  }: GoogleOauthTokenDto): Promise<GoogleUserDto> {
+  }: OauthTokenDto): Promise<GoogleUserDto> {
     try {
       const { data } = await axios.get<GoogleUserDto>(
         `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,

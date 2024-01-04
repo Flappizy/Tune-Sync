@@ -9,7 +9,7 @@ import { LoginDto } from "./loginDto";
 import config from 'config';
 import { AuthProvider } from "@prisma/client";
 
-export const loginUser = async (request: LoginUserInput) : Promise<LoginDto> => {
+export const loginUserCommandHandler = async (request: LoginUserInput) : Promise<LoginDto> => {
     const user = await findUniqueUser(
         { email: request.email.toLowerCase() },
         { id: true,  email: true, userName: true, passwordHash: true }

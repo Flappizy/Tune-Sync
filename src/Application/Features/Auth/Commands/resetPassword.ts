@@ -5,7 +5,7 @@ import { ErrorCode } from "src/Domain/Exceptions/errorCode";
 import bcrypt from 'bcryptjs';
 import logger from "src/Shared/Infrastructure/logger";
 
-export const resetPassword = async (req: ResetPasswordType) => {
+export const resetPasswordCommandHandler = async (req: ResetPasswordType) => {
     const user = await findUniqueUser(
         { passwordResetToken: req.code });
 

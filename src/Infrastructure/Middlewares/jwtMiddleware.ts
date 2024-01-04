@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { validateToken } from '../Utilities/jwtHandler';
 import { ErrorCode } from 'src/Domain/Exceptions/errorCode';
 import logger from 'src/Shared/Infrastructure/logger';
+import { TuneSyncError } from 'src/Domain/Exceptions/tuneSyncError';
+import { UNAUTHORIZED } from 'http-status';
 
 
 export function jwtHandler(req: Request, res: Response, next: NextFunction) {
@@ -11,9 +13,11 @@ export function jwtHandler(req: Request, res: Response, next: NextFunction) {
             status: ErrorCode.UnAuthorized.status,
             message: ErrorCode.UnAuthorized.message });
     } 
-
     try {
         const decodedToken = validateToken(token, 'secretKey');
+        if (decodedToken === null)
+            throw new TuneSyncError(new ErrorCode("InvalidToken", "Token is invalid", UNAUTHORIZED));
+
         if (typeof decodedToken === "object" && "id" in decodedToken!) {
           req.body.id = decodedToken.id;
         }

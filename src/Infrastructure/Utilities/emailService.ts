@@ -14,7 +14,6 @@ export const sendMail = async(messageBody: string, subject: string, userEmail: s
     sgMail.send(msg)
     .then((response) => {
       logger.info(response[0].statusCode)
-      logger.info(response[0].headers)
     })
     .catch((error) => {
       logger.info(error)

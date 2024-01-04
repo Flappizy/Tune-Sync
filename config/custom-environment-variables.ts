@@ -8,7 +8,11 @@ export default {
     sendgridApiKey: 'SENDGRID_API_KEY',
     googleOauthClientId: 'GOOGLE_OAUTH_CLIENT_ID',
     googleOauthClientSecret: 'GOOGLE_OAUTH_CLIENT_SECRET',
-    googleOauthRedirect: 'GOOGLE_OAUTH_REDIRECT'
+    googleOauthRedirect: 'GOOGLE_OAUTH_REDIRECT',
+    spotifyClientId: 'Spotify_Client_Id',
+    spotifyRedirectURI: 'Spotify_Redirect_URI',
+    spotifyClientSecret: 'Spotify_Client_Secret',
+    spotifyScope: 'Spotify_Scope'
 
     /*smtp: {
       host: 'EMAIL_HOST',

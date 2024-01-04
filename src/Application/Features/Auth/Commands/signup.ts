@@ -10,7 +10,7 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import { sendMail } from 'src/Infrastructure/Utilities/emailService';
 
-export const signup = async (request : SignupSchemaType) => {      
+export const signupCommandHandler = async (request : SignupSchemaType) => {      
 
     var emailInDb = await findUniqueUser(
       { email: request.email.toLowerCase() },

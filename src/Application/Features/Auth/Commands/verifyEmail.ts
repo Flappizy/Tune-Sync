@@ -5,7 +5,7 @@ import { TuneSyncError } from "src/Domain/Exceptions/tuneSyncError";
 import { BAD_REQUEST, UNAUTHORIZED } from "http-status";
 import logger from "src/Shared/Infrastructure/logger";
 
-export const verifyEmail = async (request: VerifyEmailType) => {
+export const verifyEmailCommandHandler = async (request: VerifyEmailType) => {
     const user = await findUniqueUser({email: request.email});
     if (!user)
         throw new TuneSyncError(ErrorCode.UserNotExits);

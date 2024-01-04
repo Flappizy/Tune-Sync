@@ -9,12 +9,16 @@ export class ErrorCode{
         return new ErrorCode('DatabaseError', 'Ecountered an error while saving to DB', INTERNAL_SERVER_ERROR);
     }
 
+    static get ServerError(): ErrorCode {
+        return new ErrorCode('ServerError', 'Server ecountered an error', INTERNAL_SERVER_ERROR);
+    }
+
     static get UserAlreadyExits(): ErrorCode {
         return new ErrorCode('UserExists', 'User with this email address already exists', CONFLICT);
     }
 
     static get UserNotExits(): ErrorCode {
-        return new ErrorCode('UserNotExists', 'User with this email address does not exists', NOT_FOUND);
+        return new ErrorCode('UserNotExists', 'User does not exists', NOT_FOUND);
     }
 
     static get NotFound(): ErrorCode {

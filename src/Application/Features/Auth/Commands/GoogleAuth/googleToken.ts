@@ -1,7 +1,7 @@
 import config from 'config';
 import axios from "axios";
 import qs from "qs";
-import { GoogleOauthTokenDto } from './googleOauthTokenDto';
+import { OauthTokenDto } from './googleOauthTokenDto';
 
 interface GoogleOauthTokenParameter {
   code: string;
@@ -10,7 +10,7 @@ interface GoogleOauthTokenParameter {
 
 export const getGoogleOauthToken = async ({
     code
-  }: GoogleOauthTokenParameter): Promise<GoogleOauthTokenDto> => {
+  }: GoogleOauthTokenParameter): Promise<OauthTokenDto> => {
     const rootURl = "https://oauth2.googleapis.com/token";
   
     const options = {
@@ -23,14 +23,11 @@ export const getGoogleOauthToken = async ({
         config.get<string>('googleOauthClientSecret'),
         'base64'
       ).toString('ascii'),
-      redirect_uri: Buffer.from(
-        config.get<string>('GOOGLE_OAUTH_REDIRECT'),
-        'base64'
-      ).toString('ascii'),
+      redirect_uri: config.get<string>('GOOGLE_OAUTH_REDIRECT'),
       grant_type: "authorization_code",
     };
     try {
-      const { data } = await axios.post<GoogleOauthTokenDto>(
+      const { data } = await axios.post<OauthTokenDto>(
         rootURl,
         qs.stringify(options),
         {
@@ -42,7 +39,6 @@ export const getGoogleOauthToken = async ({
   
       return data;
     } catch (err: any) {
-      console.log("Failed to fetch Google Oauth Tokens");
       throw new Error(err);
     }
   };

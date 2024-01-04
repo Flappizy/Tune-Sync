@@ -9,7 +9,7 @@ import { createToken } from "src/Infrastructure/Utilities/jwtHandler";
 import { LoginDto } from "../Login/loginDto";
 import config from 'config';
 
-export const loginGoogleAuthUser = async(request: string) => {
+export const loginGoogleAuthUserCommandHandler = async(request: string) => {
     const googleTokens = await getGoogleOauthToken({code: request});
     if (!googleTokens)
         throw new TuneSyncError(new ErrorCode("InvalidAuthCode", "Invalid authorization code provided", UNAUTHORIZED));

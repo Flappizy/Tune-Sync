@@ -8,7 +8,7 @@ import config from 'config';
 import { createToken } from "src/Infrastructure/Utilities/jwtHandler";
 import { RefreshTokenDto } from "./refreshTokenDto";
 
-export const refreshUserToken = async (req:RefreshTokenType) : Promise<RefreshTokenDto> => {
+export const refreshUserTokenCommandHandler = async (req:RefreshTokenType) : Promise<RefreshTokenDto> => {
     const validationResultOfRefreshToken = validateToken(req.refreshToken, 'refreshKey');
     if (!validationResultOfRefreshToken)
         throw new TuneSyncError(ErrorCode.UnAuthorized);
