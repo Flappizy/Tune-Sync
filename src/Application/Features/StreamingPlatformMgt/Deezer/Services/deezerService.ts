@@ -3,6 +3,7 @@ import { DeezerOAuthDto } from '../Commands/ConnectDeezer/deezerOauthDto';
 import axios from "axios";
 import { LibraryDto } from '../../Spotify/Queries/GetUserPlaylists/libraryDto';
 import { PlaylistDto } from '../../Spotify/Queries/GetUserPlaylists/playlistDto';
+import logger from 'src/Shared/Infrastructure/logger';
 
 class DeezerService {
     private appId;
@@ -11,14 +12,20 @@ class DeezerService {
     constructor() {
         this.appId = config.get<string>('deezerAppId').toString();
   
-        this.appSecret = config.get<string>('deezerRedirectURI').toString();
+        this.appSecret = config.get<string>('deezerSecretKey').toString();
     }
 
     async getDeezerUserAccessToken(code: string): Promise<DeezerOAuthDto> {
         const url = `https://connect.deezer.com/oauth/access_token.php?app_id=${this.appId}&secret=${this.appSecret}&code=${code}`;
+        
         try {
-            const { data } = await axios.post<DeezerOAuthDto>(url);
-              return data;
+            const { data } = await axios.get(url);
+            const match = data.match(/access_token=([^&]*)/);
+            let accessToken: string | null = null;
+            if (match && match[1]) {
+              accessToken = match[1];              
+            }
+            return { access_token: accessToken! };
         } catch (err: any) {
             throw new Error(err);
       }

@@ -8,7 +8,7 @@ router.get(
     '/auth',
     jwtHandler,
     getAuthorizationCodeFromDeezerHandler
-).post(
+).get(
     '/callback',
     storeDeezerAccessTokenInDBHandler
 ).get(

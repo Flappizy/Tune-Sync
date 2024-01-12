@@ -51,7 +51,7 @@ swaggerDocs(app, port);
 // ROUTES
 app.use('/api/auth', authRouter);
 app.use('/api/spotify', spotifyRouter);
-app.use('/api/deezer', spotifyRouter);
+app.use('/api/deezer', deezerRouter);
 
  // UNHANDLED ROUTES
  app.all('*', (req: Request, res: Response, next: NextFunction) => {

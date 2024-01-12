@@ -8,7 +8,7 @@ router.get(
     '/auth',
     jwtHandler,
     getAuthorizationCodeFromSpotifyHandler
-).post(
+).get(
     '/callback',
     storeSpotifyRefreshInDBAndAccessTokenInCookiesHandler
 ).get(

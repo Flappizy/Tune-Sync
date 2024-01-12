@@ -15,11 +15,15 @@ Promise<DeezerOAuthDto> => {
     if (!user)
         throw new TuneSyncError(ErrorCode.UserNotExits);
 
-        const userHasConnectedDeezer = await doesConnectedStreamingPlatformExists(user.id, StreamingPlatform.Deezer);
-        if(userHasConnectedDeezer)
-            throw new TuneSyncError(new ErrorCode("DeezerHasAlredyBeenConnected", "User's Deezer account has already been connected", BAD_REQUEST));
-
+        
+    const userHasConnectedDeezer = await doesConnectedStreamingPlatformExists(user.id, StreamingPlatform.Deezer);
+    if(userHasConnectedDeezer)
+        throw new TuneSyncError(new ErrorCode("DeezerHasAlredyBeenConnected", "User's Deezer account has already been connected", BAD_REQUEST));
+    
     const deezerAccessToken = await deezerService.getDeezerUserAccessToken(connectPlatform.code);
+    if (!deezerAccessToken.access_token)
+        throw new TuneSyncError(new ErrorCode("InvalidAuthCode", "Server ecountered an error", BAD_REQUEST));
+    
     try {
         await createUserStreamingPlatform({
             streamingPlatform: StreamingPlatform.Deezer,

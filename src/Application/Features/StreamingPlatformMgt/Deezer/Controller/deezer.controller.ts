@@ -3,6 +3,8 @@ import config from 'config';
 import { stateCookiesOptions } from 'src/Infrastructure/Utilities/customCookieOptions';
 import { connectDeezerCommandHandler } from '../Commands/ConnectDeezer/connectDeezerCommandHandler';
 import { getDeezerUserPlaylistsQueryHandler } from '../Queries/GetUserPlaylists/getDeezerUserPlaylistsQueryHandler';
+import logger from 'src/Shared/Infrastructure/logger';
+
 
 export const getAuthorizationCodeFromDeezerHandler =  async (
     req: Request,
@@ -14,6 +16,7 @@ export const getAuthorizationCodeFromDeezerHandler =  async (
         const url = `https://connect.deezer.com/oauth/auth.php?app_id=${appId}&redirect_uri=${redirectURI}&perms=${permissions}`;
         const state = req.cookies.refresh_token;
         res.cookie('deezer_state', state, stateCookiesOptions);
+        logger.info(state);
         return res.status(200).json(url);
 }
 
@@ -21,9 +24,9 @@ export const storeDeezerAccessTokenInDBHandler = async (
     req: Request,
     res: Response,
     next: NextFunction) => {
-        const state = req.cookies.spotify_state;
+        const state = req.cookies.deezer_state;
         if (!state)
-            return res.status(401).json({message: "Please log in before you can connect your deezer aacount"});
+            return res.status(401).json({message: "Please log in before you can connect your deezer account"});
 
         if (req.query.error_reason || req.query.error_reason === 'user_denied')
             return res.status(401).json({
@@ -32,6 +35,7 @@ export const storeDeezerAccessTokenInDBHandler = async (
             })
 
         const code = req.query.code as string;
+        logger.info(code);
         try {
             await connectDeezerCommandHandler({code: code, userRefreshToken: state });
             return res.status(204).send(); //To do: Redirect back to the client
