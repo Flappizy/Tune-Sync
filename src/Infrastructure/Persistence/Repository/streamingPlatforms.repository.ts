@@ -27,7 +27,7 @@ export const createUserStreamingPlatform = async (input: Prisma.UserConnectedStr
 
   export const findConnectedStreamingPlatformByUserId = async (userId: number, platform: StreamingPlatform) => {
     return (await prisma.userConnectedStreamingPlatform.findFirst({
-      where: { userId: userId,streamingPlatform: platform },
+      where: { userId: userId, streamingPlatform: platform },
     })) as UserConnectedStreamingPlatform;
   };
 

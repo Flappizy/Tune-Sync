@@ -13,7 +13,7 @@ Promise<LibraryDto> => {
     if (!streamingPlatform)
         throw new TuneSyncError(new ErrorCode("UnConnectedSpotifyAccount", 
             "You have not connected your spotify account, please connect before you can get your playlists", BAD_REQUEST));
-
+    
     try {
         const userLibrary = await spotifyService.getUserPlaylist(accessToken, 
                 streamingPlatform.streamingPlatformRefreshToken!, streamingPlatform.streamingPlatformUserId!, page, perPage);

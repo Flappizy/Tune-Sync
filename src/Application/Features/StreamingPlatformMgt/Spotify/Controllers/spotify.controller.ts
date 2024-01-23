@@ -3,6 +3,9 @@ import { stateCookiesOptions, spotifyCookiesOptions } from 'src/Infrastructure/U
 import config from 'config';
 import { connectSpotifyCommandHandler } from '../Commands/ConnectSpotify/connectSpotifyCommandHandler';
 import { getSpotifyUserPlaylistsQueryHandler } from '../Queries/GetUserPlaylists/getSpotifyUserPlaylistsQueryHandler';
+import { getSpotifyPlaylistTracksQueryHandler } from '../Queries/GetPlaylistTracks/getPlaylistTracksQueryHandler';
+import { PlaylistTracksSchemaType } from 'src/Domain/Validations/streamingPlatform.validation';
+import logger from 'src/Shared/Infrastructure/logger';
 
 export const getAuthorizationCodeFromSpotifyHandler =  async (
     req: Request,
@@ -49,8 +52,8 @@ export const getUserPlaylistHandler = async (
     const userId = Number(req.body.id);
     const accessToken = req.cookies.spotify_access_token;
     const page = Number(req.query.page); 
-    const perPage = Number(req.query.perPage); 
-
+    const perPage = Number(req.query.perPage);
+     
     try {
         const userLibrary = await getSpotifyUserPlaylistsQueryHandler(userId, page, perPage, accessToken);
         if (userLibrary.accessToken)
@@ -65,3 +68,32 @@ export const getUserPlaylistHandler = async (
         next(error);
     } 
 }
+
+export const getPlaylistTracksHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction) => {
+    const userId = Number(req.body.id);
+    const accessToken = req.cookies.spotify_access_token;
+    const page = req.query.page; 
+    const playlistId = req.query.playlistId;
+    const perPage = req.query.perPage;
+    const playlistDetails: PlaylistTracksSchemaType = {
+        accessToken: accessToken,
+        playlistId: playlistId as string,
+        perPage: perPage as string,
+        page: page as string
+    }
+      try {   
+        const playlistTracks = await getSpotifyPlaylistTracksQueryHandler(playlistDetails, userId, page as string, perPage as string);  
+        res.cookie('spotify_access_token', playlistTracks.accessToken, spotifyCookiesOptions);
+        
+        playlistTracks.accessToken = null;
+        return res.status(200).json({
+          status: 'success',
+          data: playlistTracks
+        });
+      } catch (error : any) {       
+        next(error); 
+      } 
+  }

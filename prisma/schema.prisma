@@ -35,9 +35,9 @@ model User {
   created                         DateTime @default(now())
   refreshTokenExpires             DateTime?@default("1970-01-01T00:00:00Z") 
   connectedStreamingPlatforms     UserConnectedStreamingPlatform[]
+  syncedPlaylists                 SyncedPlaylist[]
   @@map("Users")
 }
-
 
 model UserConnectedStreamingPlatform {
   id                                Int          @id @default(autoincrement())
@@ -48,4 +48,15 @@ model UserConnectedStreamingPlatform {
   user           User         @relation(fields: [userId], references: [id])
   created        DateTime     @default(now())
   @@map("UserConnectedStreamingPlatforms")           
+}
+
+model SyncedPlaylist {
+  id                                           Int          @id @default(autoincrement())
+  sourceStreamingPlatform                      StreamingPlatform
+  destinationStreamingPlatform                 StreamingPlatform
+  streamingPlatformPlaylistId                  String?
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  created        DateTime     @default(now())
+  @@map("SyncedPlaylists") 
 }

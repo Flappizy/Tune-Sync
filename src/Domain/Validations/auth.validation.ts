@@ -1,4 +1,4 @@
-import { object, string, TypeOf, z } from 'zod';
+import { TypeOf, z } from 'zod';
 
 function isStrongPassword(password: string): boolean {
   if (password === "" || password === null || password.length < 8) {
@@ -78,11 +78,6 @@ export const googleAuthTokenSchema = z.object({
 });
 
 export type SignupSchemaType = TypeOf<typeof signupSchema>;
-
-/*export type SignupSchemaType = Omit<
-  TypeOf<typeof signupSchema>,
-  "body.confirmPassword"
->;*/
 export type LoginUserInput = TypeOf<typeof loginUserSchema>;
 export type VerifyEmailType = TypeOf<typeof verifyEmailSchema>;
 export type EmailType = TypeOf<typeof emailSchema>;

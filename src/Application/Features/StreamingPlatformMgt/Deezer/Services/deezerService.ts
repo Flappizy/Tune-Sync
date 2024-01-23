@@ -4,6 +4,7 @@ import axios from "axios";
 import { LibraryDto } from '../../Spotify/Queries/GetUserPlaylists/libraryDto';
 import { PlaylistDto } from '../../Spotify/Queries/GetUserPlaylists/playlistDto';
 import logger from 'src/Shared/Infrastructure/logger';
+import { DeezerUserId } from '../Commands/ConnectDeezer/deezerUserId';
 
 class DeezerService {
     private appId;
@@ -28,6 +29,16 @@ class DeezerService {
             return { access_token: accessToken! };
         } catch (err: any) {
             throw new Error(err);
+      }
+    }
+
+    async getDeezerUserId(access_token: string): Promise<DeezerUserId> {
+       const url = `https://api.deezer.com/user/me?access_token=${access_token}`;
+      try {
+        const { data } = await axios.get<DeezerUserId>(url);
+        return data;
+      } catch (err: any) {
+        throw new Error(err);
       }
     }
 

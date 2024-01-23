@@ -2,11 +2,17 @@ import { SpotifyOAuthDto } from '../Commands/ConnectSpotify/spotifyOAuthDto';
 import config from 'config';
 import qs from "qs";
 import axios from "axios";
-import { UNAUTHORIZED } from 'http-status';
+import { NOT_FOUND, UNAUTHORIZED } from 'http-status';
 import { SpotifyUserId } from '../Commands/ConnectSpotify/spotifyUserId';
 import { PlaylistDto } from '../Queries/GetUserPlaylists/playlistDto';
 import { LibraryDto } from '../Queries/GetUserPlaylists/libraryDto';
 import logger from 'src/Shared/Infrastructure/logger';
+import { PlaylistTracksDto } from '../Queries/GetPlaylistTracks/playlistTracksDto';
+import { url } from 'inspector';
+import { TrackDto } from '../Queries/GetPlaylistTracks/trackDto';
+import { PlaylistTracksSchemaType } from 'src/Domain/Validations/streamingPlatform.validation';
+import { TuneSyncError } from 'src/Domain/Exceptions/tuneSyncError';
+import { ErrorCode } from 'src/Domain/Exceptions/errorCode';
 
 class SpotifyService {
   private clientId;
@@ -54,8 +60,7 @@ class SpotifyService {
       url: 'https://accounts.spotify.com/api/token',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + (Buffer.from(this.clientId + ':' + this.clientSecret).toString('base64'))
-      },
+        'Authorization': 'Basic ' + Buffer.from(this.clientId + ':' + this.clientSecret).toString('base64')      },
       form: {
         grant_type: 'refresh_token',
         refresh_token: refreshToken
@@ -72,15 +77,16 @@ class SpotifyService {
     
         return data;
       } catch (err: any) {
-        throw new Error(err);
+        logger.info(err.response.data);
+        throw new Error(err.response.data);
     }
   }
 
-  async getUserProfileData (accesToken: string): Promise<SpotifyUserId> {
+  async getUserProfileData (accessToken: string): Promise<SpotifyUserId> {
     const authOptions = {
       url: 'https://api.spotify.com/v1/me',
       headers: {
-        'Authorization': `Bearer ${accesToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         //'Content-Type': 'application/json'
       },
       json: true
@@ -92,19 +98,25 @@ class SpotifyService {
           { headers: authOptions.headers }
         );
 
-        console.log(data);
         return data;
       } catch (err: any) {
         throw new Error(err);
     }
   }
 
-  async getUserPlaylist(accesToken: string, refreshToken: string, userId: string, page: number, perPage: number): Promise<LibraryDto> {
+  async getUserPlaylist(accessToken: string, refreshToken: string, userId: string, page: number, perPage: number): Promise<LibraryDto> {
     const offset = (page - 1) * perPage;
+    let newTokens: SpotifyOAuthDto | null = null;
+    if (!accessToken || accessToken === undefined)
+    {
+         newTokens = await this.#getNewAccessToken(refreshToken);
+         accessToken = newTokens.access_token;
+    }
+    
     const authOptions = {
       url: `https://api.spotify.com/v1/users/${userId}/playlists?offset=${offset}&limit=${perPage}`,
       headers: {
-        'Authorization': `Bearer ${accesToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         //'Content-Type': 'application/json'
       },
       json: true
@@ -116,7 +128,7 @@ class SpotifyService {
         { headers: authOptions.headers }
       );
 
-      let newTokens: SpotifyOAuthDto | null = null;
+      
       if (status === UNAUTHORIZED) {
           newTokens = await this.#getNewAccessToken(refreshToken);
           authOptions.headers.Authorization = `Bearer ${newTokens.access_token}`;
@@ -150,6 +162,104 @@ class SpotifyService {
     } catch (err: any) {
         throw new Error(err);
     }
+  }
+
+  async #getPlaylist(playlistId: string, accessToken: string, refreshToken: string):
+    Promise<PlaylistTracksSchemaType> {
+    let newTokens: SpotifyOAuthDto | null = null;
+    const authOptions = {
+      url: `https://api.spotify.com/v1/playlists/${playlistId}?fields=description,name,id,images`,
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        //'Content-Type': 'application/json'
+      },
+      json: true
+    };
+
+    try {
+      
+      if (!accessToken || accessToken === undefined)
+      {
+           newTokens = await this.#getNewAccessToken(refreshToken);
+           accessToken = newTokens.access_token;
+      }
+
+      let { data, status } = await axios.get(
+        authOptions.url,
+        { headers: authOptions.headers }
+      );
+      
+      if (status === UNAUTHORIZED) {
+          newTokens = await this.#getNewAccessToken(refreshToken);
+          authOptions.headers.Authorization = `Bearer ${newTokens.access_token}`;
+          data = await axios.get(
+            authOptions.url,
+            { headers: authOptions.headers }
+          );  
+      }
+
+      const playlistDetails: PlaylistTracksSchemaType = {
+        name: data.name,
+        description: data.description,
+        playlistId: data.id,
+        imageURL: data.images[0],
+        accessToken: newTokens !== null ? newTokens.access_token : accessToken,
+        refreshToken: newTokens !== null ? newTokens.refresh_token : refreshToken,
+      }
+
+      return playlistDetails;
+
+    } catch (error: any) {
+      logger.info(error.response.data);
+
+      if (error.response.status === 400) 
+        throw new TuneSyncError(new ErrorCode("SpotifyPlayListNotFound", "Spotify playlist does not exist", NOT_FOUND));
+      
+      throw error;
+    }
+  }
+
+  async getPlayListTracks(playlistDetails: PlaylistTracksSchemaType, refreshToken: string, page: string, perPage: string): 
+    Promise<PlaylistTracksDto> {
+
+      playlistDetails = await this.#getPlaylist(playlistDetails.playlistId, playlistDetails.accessToken!, refreshToken);
+
+      const offset = (Number(page) - 1) * Number(perPage);
+      const authOptions = {
+        url: `https://api.spotify.com/v1/playlists/${playlistDetails.playlistId}/tracks?offset=${offset}&limit=${perPage}`,
+        headers: {
+          'Authorization': `Bearer ${playlistDetails.accessToken}`,
+          //'Content-Type': 'application/json'
+        },
+        json: true
+      };
+
+      try {
+        let { data } = await axios.get(
+          authOptions.url,
+          { headers: authOptions.headers }
+        );
+         
+        const tracks: TrackDto[] = data.items.map((item: any) => ({
+          artist: item.track.artists.reduce((accumulator: string, artist: { name: string }) => accumulator + artist.name + ', ', '').slice(0, -2),
+          nameOfTrack: item.track.name,
+          sourceIdOfTrack: item.track.id
+      }));
+
+      const playlistDto: PlaylistTracksDto = {
+        name: playlistDetails.name!,
+        description: playlistDetails.description!,
+        imageUrl: playlistDetails.imageURL!,
+        tracks: tracks,
+        accessToken: playlistDetails.accessToken!,
+        total: data.total as number
+      }
+      
+      return playlistDto;
+
+      } catch (error: any) {;
+        throw error;
+      }
   }
 }
 
